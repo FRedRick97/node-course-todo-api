@@ -7,10 +7,12 @@ const {Todo} = require('./../models/todo.js');
 
 const todos = [{
   _id: new ObjectID(),
-  text: "Hello World...!!!"
+  text: "Hello World...!!!",
+  completed: false
 }, {
   _id: new ObjectID(),
-  text: "Minecraft"
+  text: "Minecraft",
+  completed: false
 }];
 
 beforeEach((done) => {
@@ -128,6 +130,44 @@ describe('DELETE /todos:id', () => {
     request(app)
       .delete(`/todos/${hexId}`)
       .expect(404)
+      .end(done);
+  });
+});
+
+describe('PATCH /todos/:id', () => {
+  it('should update todo', (done) => {
+    var hexId = todos[0]._id.toHexString();
+    var text = "Minecraft"; //updated text property
+    request(app) 
+      .patch(`/todos/${hexId}`)
+      .send({ /*send info to update*/
+        completed: true,
+        text
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(text);
+        expect(res.body.todo.completed).toBe(true);
+        expect(res.body.todo.completedAt).toBeA('number');
+      })
+      .end(done);
+  });
+
+  it('should clear completedAt when todo is not completed', (done) => {
+    var hexId = todos[0]._id.toHexString();
+    var text = 'Minecraft';
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        completed: false,
+        text
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(text);
+        expect(res.body.todo.completed).toBe(false);
+        expect(res.body.todo.completedAt).toNotExist();
+      })
       .end(done);
   });
 });
