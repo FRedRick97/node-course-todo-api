@@ -33,7 +33,7 @@ app.get('/todos', (req, res) => {
 });
 
 app.get('/todos/:id', (req, res) => {
-	var id = req.params.id; // req.params itself is an object, we need to use .id to access the id property only
+	var id = req.params.id; 
 	if(!ObjectID.isValid(id)) {
 		return res.status(404).send();
 	}
