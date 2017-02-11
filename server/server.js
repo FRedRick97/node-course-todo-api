@@ -85,6 +85,21 @@ app.patch('/todos/:id', (req, res) => {
 	}).catch((e) => res.status(400).send());
 });
 
+app.post('/users', (req, res) => {
+	var body = _.pick(req.body, ['email', 'password']);
+	var user = new User(body);
+
+	/*User.findByToken -> take jwt token that user sends, find that individual user and return that individual user.*/
+	/*user.getAuthToken -> responsible for adding token on the individual user document, saving that and returning the token so we can send it back to user*/
+	user.save().then(() => {
+		return user.generateAuthToken();
+	}).then((token) => { //return token received
+		res.header('x-auth', token).send(user); // send token back as http response header
+	}).catch((e) => {
+		res.status(400).send(e);
+	});
+});
+
 app.listen(3000, () => {
 	console.log('Started on port 3000');
 });
