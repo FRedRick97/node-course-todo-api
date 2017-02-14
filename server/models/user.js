@@ -3,7 +3,7 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
 
-var UserSchema = new mongoose.Schema({ /*the schema property lets you define a schema, we cant add onto User model, so we have to switch how we are generating the model.*/
+var UserSchema = new mongoose.Schema({
 	email: {
 		type: String,
 		required: true,
@@ -32,14 +32,15 @@ var UserSchema = new mongoose.Schema({ /*the schema property lets you define a s
 	}]
 }); 
 
-UserSchema.methods.toJSON = function () { //toJSON is a predefined method which we are overriding
+
+UserSchema.methods.toJSON = function () { 
 	var user = this;
 	var userObject = user.toObject();
 
 	return _.pick(userObject, ['_id', 'email']);
 };
 
-UserSchema.methods.generateAuthToken = function () { /*we are not using arrow function because they do not bind this keyword*/
+UserSchema.methods.generateAuthToken = function () { 
 	var user = this;
 	var access = 'auth';
 	var token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
@@ -48,6 +49,23 @@ UserSchema.methods.generateAuthToken = function () { /*we are not using arrow fu
 
 	return user.save().then(() => {
 		return token;
+	});
+};
+
+UserSchema.statics.findByToken = function(token) {
+	var User = this; 
+	var decoded;
+
+	try{
+		decoded = jwt.verify(token, 'abc123');
+	} catch(e) {
+		return Promise.reject();
+	}
+
+	return User.findOne({
+		'_id': decoded._id,
+		'tokens.token': token,
+		'tokens.access': 'auth'
 	});
 };
 

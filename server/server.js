@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var {mongoose} = require('./db/mongoose.js');
 var {Todo} = require('./models/todo.js');
 var {User} = require('./models/user.js');
+var {authenticate} = require('./middleware/authenticate.js');
 
 var app = express();
 
@@ -89,15 +90,17 @@ app.post('/users', (req, res) => {
 	var body = _.pick(req.body, ['email', 'password']);
 	var user = new User(body);
 
-	/*User.findByToken -> take jwt token that user sends, find that individual user and return that individual user.*/
-	/*user.getAuthToken -> responsible for adding token on the individual user document, saving that and returning the token so we can send it back to user*/
 	user.save().then(() => {
 		return user.generateAuthToken();
 	}).then((token) => { //return token received
-		res.header('x-auth', token).send(user); // send token back as http response header
+		res.header('x-auth', token).send(user);
 	}).catch((e) => {
 		res.status(400).send(e);
 	});
+});
+
+app.get('/users/me', authenticate, (req, res) => {
+	res.send(req.user);
 });
 
 app.listen(3000, () => {
