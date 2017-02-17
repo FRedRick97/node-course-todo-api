@@ -1,6 +1,7 @@
 const {SHA256} = require('crypto-js');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+/**https://www.npmjs.com/package/bcrypt.js**/
 
 var password = '123abc!';
 

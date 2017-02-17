@@ -69,11 +69,11 @@ UserSchema.statics.findByToken = function(token) {
 	});
 };
 
-UserSchema.pre('save', function (next) {
+UserSchema.pre('save', function (next) { /**http://mongoosejs.com/docs/middleware.html**/
 	var user = this;
 
 	if(user.isModified('password')) {/*takes an individial property returns true if the property was modified, false if it is not.*/
-		bcrypt.genSalt(10, (err, salt) => {
+		bcrypt.genSalt(10, (err, salt) => { /**https://www.npmjs.com/package/bcrypt.js**/
 			bcrypt.hash(user.password, salt, (err, hash) => {
 				user.password = hash;
 				next();
