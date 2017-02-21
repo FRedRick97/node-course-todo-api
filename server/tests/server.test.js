@@ -188,7 +188,7 @@ describe('GET /users/me', () => {
       .expect((res) => {
         expect(res.body).toEqual({});
       })
-      .end((done));
+      .end(done);
   });
 });
 
@@ -230,7 +230,7 @@ describe('POST /users', () => {
 
   });
 
-  it('shuld not create user if email in use', (done) => {
+  it('should not create user if email in use', (done) => {
 
     request(app)
       .post('/users')
